@@ -54,18 +54,18 @@ router.get('/search', verifyToken, (req, res) => {
         res.status(401).json({ message: 'Usuario no encontrado' })
         
     } else {
-        res.send(
-            ` <h1>Bienvenido, ${user.name}!</h1> 
-            <form action="/character/:name" method="post">
-                <input type="text" id="characterName" placeholder="Rick" />
+        const searchForm = ` <h1>Bienvenido, ${user.name}!</h1> 
+            <form action="/characters/search" method="post">
+                <input type="text" id="characterName" name="name" placeholder="Rick" />
+                <button type="submit">Obtener info</button>
             </form>
-            <button>Obtener info</button>
+            <button type="submit">Obtener info</button>
             <div id="characterInfo"></div>
             <form action="/logout" method="post"> 
             <button type="submit">Cerrar sesión</button> 
             </form> 
             <a href="/">home</a> `
-            )
+        res.send(searchForm)
     } 
     });
 
@@ -88,10 +88,16 @@ router.get("/characters", verifyToken,async (req,res) =>
         res.status(500).json({error: `personaje no encontrado, ${err}`})
     }
 })
+  
+router.post("/characters/search", verifyToken, async (req, res) => {
+    const name = req.body.name
+    res.redirect(`/characters/${name}`
     
+    )
+})
 router.get("/characters/:name", verifyToken, async (req,res) => {
-    const name = req.params.name
     const url = "https://rickandmortyapi.com/api/character"
+    const name = req.params.name
     try { 
         const response = await axios.get(`${url}?name=${name}`)
         let data = []
@@ -107,7 +113,6 @@ router.get("/characters/:name", verifyToken, async (req,res) => {
         res.json(characterList)
     } catch (err){ 
         res.status(500).json({error: `personaje no encontrado, ${err}`})
-
     }
 })
 
